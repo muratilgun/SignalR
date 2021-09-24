@@ -27,6 +27,8 @@ namespace SignalRExample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddCors(opt => opt.AddDefaultPolicy(policy=> policy.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true)));
             services.AddSignalR();
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -44,7 +46,7 @@ namespace SignalRExample
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SignalRExample v1"));
             }
-
+            app.UseCors();
             app.UseHttpsRedirection();
 
             app.UseRouting();
