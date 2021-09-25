@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using SignalRExample.Business;
 using SignalRExample.Hubs;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,11 @@ namespace SignalRExample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddCors(opt => opt.AddDefaultPolicy(policy=> policy.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true)));
+            services.AddTransient<MyBusiness>();
+
             services.AddSignalR();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -48,11 +51,8 @@ namespace SignalRExample
             }
             app.UseCors();
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
