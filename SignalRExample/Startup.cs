@@ -57,6 +57,7 @@ namespace SignalRExample
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<MyHub>("/myhub");
+                endpoints.MapHub<MessageHub>("/messagehub");
             });
         }
     }

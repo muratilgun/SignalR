@@ -6,7 +6,7 @@
 <script>
     $(document).ready(() => {
         const connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:5001/myhub", {
+        .withUrl("https://localhost:5001/messagehub", {
       skipNegotiation: true,
       transport: signalR.HttpTransportType.WebSockets})
         .withAutomaticReconnect([1000, 1000, 2000, 3000, 5000, 10000]) //0 - 2 - 10 - 30 saniye aralıklarla bağlanmayı deneyecek
@@ -47,25 +47,28 @@
             durum.html("Bağlanılamadı......");
             animation();
         });
-        connection.on("userJoined", connectionId => {
-            durum.html(`${connectionId} bağlandı.`);
-            durum.css("background-color","green");
-            animation();
-        });
-        connection.on("userLeft", connectionId => {
-            durum.html(`${connectionId} ayrıldı.`);            
-            durum.css("background-color","red");
-            animation();
-        });
+       
+        //#region ESKİ
+        // connection.on("userJoined", connectionId => {
+        //     durum.html(`${connectionId} bağlandı.`);
+        //     durum.css("background-color","green");
+        //     animation();
+        // });
+        // connection.on("userLeft", connectionId => {
+        //     durum.html(`${connectionId} ayrıldı.`);            
+        //     durum.css("background-color","red");
+        //     animation();
+        // });
 
-        connection.on("clients", clientsData => {
-            let text  ="";
-            $.each(clientsData, (index, item) => {
-                text += `<li>${item}</li>`;
-                $("#clients").html(text);
-            });
-        });
-
+        // connection.on("clients", clientsData => {
+        //     let text  ="";
+        //     $.each(clientsData, (index, item) => {
+        //         text += `<li>${item}</li>`;
+        //         $("#clients").html(text);
+        //     });
+        // });
+//#endregion
+       
         $("#btnGonder").click(()=> {
             let message = $("#txtMessage").val();
             connection.invoke("SendMessage",message).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
@@ -74,20 +77,25 @@
         $("#mesajlar").append(message + "<br>");
         });
         //Bağlantı hiç oluşturulmazsa
-
+        connection.on("getConnectionId", connectionId=> {
+            $("#connectionId").html(`Connection Id : ${connectionId}`);
+        });
 
     });
 </script> 
 </head>
 <body>
+<div style="background-color: black; color: white;" id="connectionId"></div>
+
     <div id = "durum" style="display: none;"></div>
     <input type="text" id="txtMessage">
     <button id="btnGonder">Gönder</button>
     <div id = "mesajlar" ></div>
-    <div>
+
+    <!-- <div>
         <ul id="clients">
 
         </ul>
-    </div>
+    </div> -->
 </body>
 </html>
