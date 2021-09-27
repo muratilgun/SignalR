@@ -3,126 +3,109 @@
 <head>
 <script src="signalr.min.js"></script>    
 <script src="jquery.min.js"></script>   
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<!-- <link rel="stylesheet" href="styles/sytle.css"> -->
+
 <script>
     $(document).ready(() => {
+
         const connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:5001/messagehub", {
-      skipNegotiation: true,
-      transport: signalR.HttpTransportType.WebSockets})
-        .withAutomaticReconnect([1000, 1000, 2000, 3000, 5000, 10000]) //0 - 2 - 10 - 30 saniye aralıklarla bağlanmayı deneyecek
+        .withUrl("https://localhost:5001/chathub")
+        .configureLogging(signalR.LogLevel.Trace)
         .build();
 
-        async function start(){
-            try {
-                connection.start();
-            } catch (error) {
-                setTimeout(()=> start(), 2000); 
-            }
-        }
-        //connection.start();
-        start();
+        connection.start();
 
-        function animation(){
-            durum.fadeIn(2000,()=> {
-                setTimeout(() => {durum.fadeOut(2000);
-                }, 2000)
+        $(".disabled").attr("disabled","disabled");
+
+        $(".users").click(function() {
+            $(".users").each((index, item) => {
+                item.classList.remove("active");
+              });
+              $(this).addClass("active");
+        });
+
+        $("#btnGirisYap").click(() => {
+            const nickName = $("#txtNickName").val();
+            connection.invoke("GetNickName", nickName).catch(error => console.log(error));
+            $(".disabled").removeAttr("disabled");
+        });
+        connection.on("clientJoined", nickName => {
+            $("#clientDurumMesajlari").html(`${nickName} giriş yaptı.`);
+            $("#clientDurumMesajlari").fadeIn(2000, ()=> {
+                setTimeout(() => {
+                    $("#clientDurumMesajlari").fadeOut(2000);
+                },2000)
             });
-        }
-        const durum = $("#durum");
-        connection.onreconnecting(error => {
-            durum.css("background-color","blue");
-            durum.css("color","white");
-            durum.html("Bağlantı kuruluyor......");
-            animation();
-        });
-        connection.onreconnected(connectionId => {
-            durum.css("background-color","green");
-            durum.css("color","white");
-            durum.html("Bağlantı kuruldu......");
-            animation();
-        });
-        connection.onclose(connectionId => {
-            durum.css("background-color","red");
-            durum.css("color","white");
-            durum.html("Bağlanılamadı......");
-            animation();
-        });
-       
-        //#region ESKİ
-        // connection.on("userJoined", connectionId => {
-        //     durum.html(`${connectionId} bağlandı.`);
-        //     durum.css("background-color","green");
-        //     animation();
-        // });
-        // connection.on("userLeft", connectionId => {
-        //     durum.html(`${connectionId} ayrıldı.`);            
-        //     durum.css("background-color","red");
-        //     animation();
-        // });
-
-        // connection.on("clients", clientsData => {
-        //     let text  ="";
-        //     $.each(clientsData, (index, item) => {
-        //         text += `<li>${item}</li>`;
-        //         $("#clients").html(text);
-        //     });
-        // });
-//#endregion
-       
-        $("#btnGonder").click(()=> {
-            let message = $("#txtMessage").val();
-            let connectionIds = $("#connectionIds").val().split(",");
-            let groups = $("#txtGroups").val().split(",");
-            // connection.invoke("SendMessage",message,connectionIds).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
-            connection.invoke("SendMessage",message,groups[0]).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
-
-        });
-        connection.on("receiveMessage", message => {
-        $("#mesajlar").append(message + "<br>");
-        });
-        //Bağlantı hiç oluşturulmazsa
-        let _connectionId = "";
-        connection.on("getConnectionId", connectionId=> {
-            _connectionId = connectionId;
-            $("#connectionId").html(`Connection Id : ${connectionId}`);
-        });
-        $("#btnGrubaGir").click(()=> {
-            let groupName = $("input[name=grup]:checked").val();
-            connection.invoke("addGroup",_connectionId,groupName).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
-
         });
 
-    });
+        $("#btnGonder").click(() =>{
+            var x = $(".message").clone();
+            x.removeClass("message");
+            x.find("h5")[1].innerHTML = "";
+            x.find("h5")[0].innerHTML = "";
+            $(".messages").append(x);
+        }) 
+    })
 </script> 
 </head>
 <body>
-<div style="background-color: black; color: white;" id="connectionId"></div>
-<br>
-<br>
-<input type="radio" name="grup" value="A">A
-<input type="radio" name="grup" value="B">B
-<input type="radio" name="grup" value="C">C
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="row">
+                <!-- Sol Menü-->
+                <div class="col-md-3">
+                  <!--Oda-->
+                    <input class="form-control form-control-lg disabled" type="text" placeholder="Oda adı">
+                    <button type="button" class="btn btn-info rightButton disabled">Oda Oluştur</button>
+                    <select size="5" style="width: 100%;" class="form-select disabled" multiple>
+                    <option selected value="-1">Odalar</option>
+                    </select>
+                    <button type="button" class="btn btn-primary rightButton disabled">Seçili Odalara Gir</button>
+                  <!--Oda-->
+                    <br><br><br>
+                 <!--Clientlar-->
+                    <div class="list-group">
+                    <a class="list-group-item list-group-item-action users" aria-current="true">
+                        Tümü
+                    </a>
+                    <a class="list-group-item list-group-item-action users" aria-current="true">
+                        Merhaba 
+                    </a>
+                    </div>
+                    <!--Clientlar-->
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-success" id="clientDurumMesajlari" style="display: none;">
 
-<button id="btnGrubaGir">Gruba Gir</button>
-    <div id = "durum" style="display: none;"></div>
-    <br>
-    <br>
-    <input type="text" id="txtMessage" placeholder="Mesaj" style="width: 216px;">
-    <br>
-    <br>  
-     <input type="text" id="txtGroups" placeholder="Groups" style="width: 216px;">
-    <br>
-    <br>
-    <textarea id="connectionIds" cols="30" rows="10" placeholder="Connection Id"></textarea>
-    <br>
-    <br>
-    <button id="btnGonder" style="width: 223px; height: 25px;">Gönder</button>
-    <div id = "mesajlar" ></div>
-
-    <!-- <div>
-        <ul id="clients">
-
-        </ul>
-    </div> -->
+                    </div>
+                    <!--Mesajlaşma-->
+                    <textarea class="form-control" style="margin-top: 5px;" placeholder="İletilecek mesajı buraya giriniz."
+                    rows="3"></textarea>
+                    <button type="button" class="btn btn-light rightButton" id="btnGonder">Gönder</button>
+                    <br><br><br>
+                    <div class="list-group">
+                        <a class="list-group-item list-group-item-action" aria-current="true">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Ahmet</h5>
+                                <h5 class="mb-2">Sen</h5>
+                            </div>
+                            <p class="mb-1">Merhaba buraya bir yazı yazıyoruki buraki boşluk dolsun</p>
+                            <small>Buraya yazılabilecek en güzel yazı</small>
+                        </a>
+                    </div>
+                    <!--Mesajlaşma-->
+                </div>
+                <div class="col-md-3">
+                    <input class="form-control form-control-lg" type="text" placeholder="Adınız/Nick" id="txtNickName">
+                    <button type="button" class="btn btn-success leftButton" id="btnGirisYap">Giriş Yap</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1">
+        </div>
+    </div>
 </body>
 </html>

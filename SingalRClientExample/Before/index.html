@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="signalr.min.js"></script>    
+<script src="jquery.min.js"></script>   
+<script>
+    $(document).ready(() => {
+        const connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:5001/messagehub", {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets})
+        .withAutomaticReconnect([1000, 1000, 2000, 3000, 5000, 10000]) //0 - 2 - 10 - 30 saniye aralıklarla bağlanmayı deneyecek
+        .build();
+
+        async function start(){
+            try {
+                connection.start();
+            } catch (error) {
+                setTimeout(()=> start(), 2000); 
+            }
+        }
+        //connection.start();
+        start();
+
+        function animation(){
+            durum.fadeIn(2000,()=> {
+                setTimeout(() => {durum.fadeOut(2000);
+                }, 2000)
+            });
+        }
+        const durum = $("#durum");
+        connection.onreconnecting(error => {
+            durum.css("background-color","blue");
+            durum.css("color","white");
+            durum.html("Bağlantı kuruluyor......");
+            animation();
+        });
+        connection.onreconnected(connectionId => {
+            durum.css("background-color","green");
+            durum.css("color","white");
+            durum.html("Bağlantı kuruldu......");
+            animation();
+        });
+        connection.onclose(connectionId => {
+            durum.css("background-color","red");
+            durum.css("color","white");
+            durum.html("Bağlanılamadı......");
+            animation();
+        });
+       
+        //#region ESKİ
+        // connection.on("userJoined", connectionId => {
+        //     durum.html(`${connectionId} bağlandı.`);
+        //     durum.css("background-color","green");
+        //     animation();
+        // });
+        // connection.on("userLeft", connectionId => {
+        //     durum.html(`${connectionId} ayrıldı.`);            
+        //     durum.css("background-color","red");
+        //     animation();
+        // });
+
+        // connection.on("clients", clientsData => {
+        //     let text  ="";
+        //     $.each(clientsData, (index, item) => {
+        //         text += `<li>${item}</li>`;
+        //         $("#clients").html(text);
+        //     });
+        // });
+//#endregion
+       
+        $("#btnGonder").click(()=> {
+            let message = $("#txtMessage").val();
+            let connectionIds = $("#connectionIds").val().split(",");
+            let groups = $("#txtGroups").val().split(",");
+            // connection.invoke("SendMessage",message,connectionIds).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
+            connection.invoke("SendMessage",message,groups[0]).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
+
+        });
+        connection.on("receiveMessage", message => {
+        $("#mesajlar").append(message + "<br>");
+        });
+        //Bağlantı hiç oluşturulmazsa
+        let _connectionId = "";
+        connection.on("getConnectionId", connectionId=> {
+            _connectionId = connectionId;
+            $("#connectionId").html(`Connection Id : ${connectionId}`);
+        });
+        $("#btnGrubaGir").click(()=> {
+            let groupName = $("input[name=grup]:checked").val();
+            connection.invoke("addGroup",_connectionId,groupName).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
+
+        });
+
+    });
+</script> 
+</head>
+<body>
+<div style="background-color: black; color: white;" id="connectionId"></div>
+<br>
+<br>
+<input type="radio" name="grup" value="A">A
+<input type="radio" name="grup" value="B">B
+<input type="radio" name="grup" value="C">C
+
+<button id="btnGrubaGir">Gruba Gir</button>
+    <div id = "durum" style="display: none;"></div>
+    <br>
+    <br>
+    <input type="text" id="txtMessage" placeholder="Mesaj" style="width: 216px;">
+    <br>
+    <br>  
+     <input type="text" id="txtGroups" placeholder="Groups" style="width: 216px;">
+    <br>
+    <br>
+    <textarea id="connectionIds" cols="30" rows="10" placeholder="Connection Id"></textarea>
+    <br>
+    <br>
+    <button id="btnGonder" style="width: 223px; height: 25px;">Gönder</button>
+    <div id = "mesajlar" ></div>
+
+    <!-- <div>
+        <ul id="clients">
+        </ul>
+    </div> -->
+</body>
+</html>
