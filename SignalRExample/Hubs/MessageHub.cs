@@ -8,7 +8,10 @@ namespace SignalRExample.Hubs
 {
     public class MessageHub : Hub
     {
-        public async Task SendMessage(string message,IEnumerable<string> connectionIds)
+        //public async Task SendMessage(string message,IEnumerable<string> connectionIds)
+        //public async Task SendMessage(string message,string groupName, IEnumerable<string> connectionIds)
+        //public async Task SendMessage(string message,IEnumerable<string> groups)
+        public async Task SendMessage(string message,string groupname)
         {
             #region Caller
             //Sadece server'a bildirim gönderen client'la iletişim kurar.
@@ -29,39 +32,48 @@ namespace SignalRExample.Hubs
 
             #region AllExcept
             //Belirtilen clientlar hariç server'a bağlı olan tüm clientlara bildiride bulunur.
-            await Clients.AllExcept(connectionIds).SendAsync("receiveMessage", message);
+            //await Clients.AllExcept(connectionIds).SendAsync("receiveMessage", message);
             #endregion
 
             #region Client
-
+            // Server'a bağlı olan clientlar arasından sadece belirli bir clienta bildiride bulunur.
+            //await Clients.Clients(connectionIds.First()).SendAsync("receiveMessage", message);
             #endregion
 
             #region Clients
+            //Server'a bağlı olan clientlar arasından sadece belirtilenlere bildiride bulunur.
+            //await Clients.Clients(connectionIds).SendAsync("receiveMessage", message);
 
             #endregion
 
             #region Group
+            //Belirtilen gruptaki tüm clientlara bildiride bulunur.
+            // Önce gruplar oluşturulmalı ve ardından clientlar gruplara subsc. olmalıdır.
+            //await Clients.Group(groupName).SendAsync("receiveMessage", message);
 
             #endregion
 
             #region GroupExcept
+            //Belirtilen gruptaki belirtilen clientlar dışındaki tüm clientlara mesaj iletmemizi sağlayan fonksiyondur.
+            //await Clients.GroupExcept(groupName,connectionIds).SendAsync("receiveMessage", message);
 
             #endregion
 
             #region Groups
-
+            //await Clients.Groups(groups).SendAsync("receiveMessage", message);
             #endregion
 
             #region OthersInGroup
-
+            //Bildiride bulunan client haricinde gruptaki tüm clientlara bildiride bulunan fonksiyondur.
+            await Clients.OthersInGroup(groupname).SendAsync("receiveMessage", message);
             #endregion
 
             #region User
-
+            //Authenticate olmuş kullanıcalara bildirim yapma ile ilgili metotdur. Sadece bir kullanıcıya bildiride bulunur.
             #endregion
 
             #region Users
-
+            //Authenticate olmuş kullanıcalara bildirim yapma ile ilgili metotdur. Birden fazla kullanıcıya bildiride bulunur.
             #endregion
 
             #endregion
@@ -69,6 +81,11 @@ namespace SignalRExample.Hubs
         public override async Task OnConnectedAsync()
         {
            await Clients.Caller.SendAsync("getConnectionId", Context.ConnectionId);
+        }
+
+        public async Task addGroup(string connnectionId, string groupName)
+        {
+            await Groups.AddToGroupAsync(connnectionId,groupName);
         }
     }
 }
