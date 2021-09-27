@@ -8,7 +8,7 @@ namespace SignalRExample.Hubs
 {
     public class MessageHub : Hub
     {
-        public async Task SendMessage(string message)
+        public async Task SendMessage(string message,IEnumerable<string> connectionIds)
         {
             #region Caller
             //Sadece server'a bildirim gönderen client'la iletişim kurar.
@@ -22,13 +22,14 @@ namespace SignalRExample.Hubs
 
             #region Other
             //Sadece server'a bağlı olan client dışında, server'a bağlı olan tüm clientlara mesaj gönderir.
-            await Clients.Others.SendAsync("receiveMessage", message);
+            //await Clients.Others.SendAsync("receiveMessage", message);
             #endregion
 
             #region Hub Clients Metotları
 
             #region AllExcept
-
+            //Belirtilen clientlar hariç server'a bağlı olan tüm clientlara bildiride bulunur.
+            await Clients.AllExcept(connectionIds).SendAsync("receiveMessage", message);
             #endregion
 
             #region Client

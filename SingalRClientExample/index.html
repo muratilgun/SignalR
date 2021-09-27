@@ -71,7 +71,8 @@
        
         $("#btnGonder").click(()=> {
             let message = $("#txtMessage").val();
-            connection.invoke("SendMessage",message).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
+            let connectionIds = $("#connectionIds").val().split(",");
+            connection.invoke("SendMessage",message,connectionIds).catch(error => console.log(`Mesaj gönderilirken hata oluştu. ${error}`));
         });
         connection.on("receiveMessage", message => {
         $("#mesajlar").append(message + "<br>");
@@ -89,6 +90,7 @@
 
     <div id = "durum" style="display: none;"></div>
     <input type="text" id="txtMessage">
+    <textarea id="connectionIds" cols="30" rows="10"></textarea>
     <button id="btnGonder">Gönder</button>
     <div id = "mesajlar" ></div>
 
