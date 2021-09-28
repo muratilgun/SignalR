@@ -19,7 +19,7 @@ namespace ChatExample.Hubs
             };
             ClientSource.Clients.Add(client);
             await Clients.Others.SendAsync("clientJoined", nickName);
-
+            await Clients.All.SendAsync("clients", ClientSource.Clients);
         }
     }
 }

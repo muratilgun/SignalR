@@ -19,7 +19,7 @@
 
         $(".disabled").attr("disabled","disabled");
 
-        $(".users").click(function() {
+        $("body").on("click",".users",function() {
             $(".users").each((index, item) => {
                 item.classList.remove("active");
               });
@@ -39,6 +39,17 @@
                 },2000)
             });
         });
+
+        connection.on("clients", clients => {
+            $("#_clients").html("");
+            $.each(clients, (index, item) => {
+            const user = $(".users").first().clone();
+            user.removeClass("active");
+            user.html(item.nickName);
+            $("#_clients").append(user);
+            })
+        })
+
 
         $("#btnGonder").click(() =>{
             var x = $(".message").clone();
@@ -67,13 +78,11 @@
                   <!--Oda-->
                     <br><br><br>
                  <!--Clientlar-->
-                    <div class="list-group">
-                    <a class="list-group-item list-group-item-action users" aria-current="true">
+                    <div class="list-group clients">
+                    <a class="list-group-item list-group-item-action users active">
                         Tümü
                     </a>
-                    <a class="list-group-item list-group-item-action users" aria-current="true">
-                        Merhaba 
-                    </a>
+                    <div id="_clients"></div>
                     </div>
                     <!--Clientlar-->
                 </div>
