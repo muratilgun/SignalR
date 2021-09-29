@@ -25,14 +25,15 @@ namespace ChatExample.Hubs
         public async Task SendMessageAsync(string message, string clientName)
         {
             clientName = clientName.Trim();
+            Client senderClient = ClientSource.Clients.FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
             if (clientName == "Tümü")
             {
-                await Clients.Others.SendAsync("receiveMessage", message);
+                await Clients.Others.SendAsync("receiveMessage", message, senderClient.NickName);
             }
             else
             {
                 Client client = ClientSource.Clients.FirstOrDefault(x => x.NickName == clientName);
-                await Clients.Client(client.ConnectionId).SendAsync("receiveMessage", message);
+                await Clients.Client(client.ConnectionId).SendAsync("receiveMessage", message, senderClient.NickName);
 
             }
 
