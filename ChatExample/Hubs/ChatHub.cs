@@ -40,17 +40,34 @@ namespace ChatExample.Hubs
         public async Task AddGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            GroupSource.Groups.Add(new Group { GroupName = groupName });
+            Group g = new Group { GroupName = groupName };
+            g.Clients.Add(ClientSource.Clients.FirstOrDefault(x=> x.ConnectionId == Context.ConnectionId));
+
+            GroupSource.Groups.Add(g);
 
             await Clients.All.SendAsync("groups", GroupSource.Groups);
         }
 
         public async Task AddClientToGroup(IEnumerable<string> groupNames)
         {
+            Client cl = ClientSource.Clients.FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
             foreach (var group in groupNames)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                Group _g = GroupSource.Groups.FirstOrDefault(g => g.GroupName == group);
+                var result = _g.Clients.Any(c => c.ConnectionId == Context.ConnectionId);
+                if (!result)
+                {
+                    _g.Clients.Add(cl);
+                    await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                }
+                
             }
+        }
+
+        public async Task GetClientToGroup(string groupName)
+        {
+            Group group = GroupSource.Groups.FirstOrDefault(g => g.GroupName == groupName);
+            await Clients.Caller.SendAsync("client", groupName == "-1" ? ClientSource.Clients : group.Clients);
         }
     }
 }

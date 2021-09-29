@@ -86,7 +86,10 @@
                 groupNames.push(e.innerHTML);
             })
             connection.invoke("AddClientToGroup", groupNames);
-        })
+        });
+        $(".rooms").change(function() {
+            let groupName = $(this).val();
+        });
     })
 </script> 
 </head>
