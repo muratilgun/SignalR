@@ -44,5 +44,13 @@ namespace ChatExample.Hubs
 
             await Clients.All.SendAsync("groups", GroupSource.Groups);
         }
+
+        public async Task AddClientToGroup(IEnumerable<string> groupNames)
+        {
+            foreach (var group in groupNames)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, group);
+            }
+        }
     }
 }
