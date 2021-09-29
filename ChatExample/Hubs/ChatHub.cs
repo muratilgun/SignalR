@@ -40,10 +40,10 @@ namespace ChatExample.Hubs
         public async Task AddGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            Group g = new Group { GroupName = groupName };
-            g.Clients.Add(ClientSource.Clients.FirstOrDefault(x=> x.ConnectionId == Context.ConnectionId));
+            Group group = new Group { GroupName = groupName };
+            group.Clients.Add(ClientSource.Clients.FirstOrDefault(x=> x.ConnectionId == Context.ConnectionId));
 
-            GroupSource.Groups.Add(g);
+            GroupSource.Groups.Add(group);
 
             await Clients.All.SendAsync("groups", GroupSource.Groups);
         }
@@ -67,7 +67,7 @@ namespace ChatExample.Hubs
         public async Task GetClientToGroup(string groupName)
         {
             Group group = GroupSource.Groups.FirstOrDefault(g => g.GroupName == groupName);
-            await Clients.Caller.SendAsync("client", groupName == "-1" ? ClientSource.Clients : group.Clients);
+            await Clients.Caller.SendAsync("clients", groupName == "-1" ? ClientSource.Clients : group.Clients);
         }
     }
 }

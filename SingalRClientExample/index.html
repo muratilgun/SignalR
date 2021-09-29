@@ -89,6 +89,7 @@
         });
         $(".rooms").change(function() {
             let groupName = $(this).val();
+            connection.invoke("GetClientToGroup", groupName[0]);
         });
     })
 </script> 
