@@ -69,5 +69,10 @@ namespace ChatExample.Hubs
             Group group = GroupSource.Groups.FirstOrDefault(g => g.GroupName == groupName);
             await Clients.Caller.SendAsync("clients", groupName == "-1" ? ClientSource.Clients : group.Clients);
         }
+
+        public async Task SendMessageToGroup(string groupName, string message)
+        {
+            await Clients.Group(groupName).SendAsync("receiveMessage", message,ClientSource.Clients.FirstOrDefault(c=> c.ConnectionId == Context.ConnectionId).NickName);
+        }
     }
 }
