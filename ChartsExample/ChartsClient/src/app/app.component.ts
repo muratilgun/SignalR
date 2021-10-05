@@ -8,8 +8,40 @@ import  * as Highcharts from 'highcharts';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  connection : signalR.HubConnection;
+  constructor(){
+    this.connection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:5001/satishub")
+    .build();
+    this.connection.start();
+    this.connection.on("receiveMessage", message => {
+      console.log(message)
+      for (let i= 0; i < this.chart.series.length; i++ ){
+        this.chart.series[i].remove();
+      }
+      for (let i = 0; i< message.length; i++){
+        this.chart.addSeries(message[i]);
+      }
+      this.updateFromInput = true;
+      this.chart.hideLoading();
+
+
+      this.chartOptions.series = message;
+      this.updateFromInput = true;
+      this.chart.hideLoading();
+
+    });
+    const self = this;
+    this.chartCallback = chart => {
+      self.chart = chart;
+    }
+
+  }
+  chart;
+  updateFromInput = false;
+  chartCallback;
   Highcharts : typeof Highcharts = Highcharts;
-  chartOption: Highcharts.Options ={
+  chartOptions: Highcharts.Options ={
     //Grafic title
     title:{
       text : "Başlık"
@@ -33,23 +65,6 @@ export class AppComponent {
       align: "right",
       verticalAlign: "middle"
     },
-    series:[
-      {
-        name: "X",
-        type: "line",
-        data: [1000,2000,3000]
-      },
-      {
-        name: "Y",
-        type: "line",
-        data: [500,7800,4600]
-      },
-      {
-        name: "Z",
-        type: "line",
-        data: [850,1200,6700]
-      }
-    ],
     plotOptions: {
       series: {
         label: {

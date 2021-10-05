@@ -1,3 +1,7 @@
+using ChartsServer.Hubs;
+using ChartsServer.Models;
+using ChartsServer.Subscription;
+using ChartsServer.Subscription.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,10 +27,13 @@ namespace ChartsServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(x => true)));
+            services.AddSignalR();
+            services.AddSingleton<DatabaseSubscription<Satislar>>();
+            services.AddSingleton<DatabaseSubscription<Personeller>>();
             services.AddRazorPages();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -36,10 +43,12 @@ namespace ChartsServer
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseCors();
 
+            app.UseDatabaseSubscription<DatabaseSubscription<Satislar>>("Satislar");
+            app.UseDatabaseSubscription<DatabaseSubscription<Personeller>>("Personeller");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -49,7 +58,7 @@ namespace ChartsServer
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapHub<SatisHub>("/satishub");
             });
         }
     }
