@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRExample", "SignalREx
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatExample", "ChatExample\ChatExample.csproj", "{58BF8AC3-BE14-4142-B9D2-E1EAB29BC31E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChartsServer", "ChartsServer\ChartsServer.csproj", "{FC47CFD8-E1ED-4D1B-A574-C98B70A4761A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChartsServer", "ChartsServer\ChartsServer.csproj", "{FC47CFD8-E1ED-4D1B-A574-C98B70A4761A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiExample", "ApiExample\ApiExample.csproj", "{4DC96B04-C313-4773-B236-9C3B5C71CC42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{FC47CFD8-E1ED-4D1B-A574-C98B70A4761A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC47CFD8-E1ED-4D1B-A574-C98B70A4761A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC47CFD8-E1ED-4D1B-A574-C98B70A4761A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DC96B04-C313-4773-B236-9C3B5C71CC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DC96B04-C313-4773-B236-9C3B5C71CC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DC96B04-C313-4773-B236-9C3B5C71CC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DC96B04-C313-4773-B236-9C3B5C71CC42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
