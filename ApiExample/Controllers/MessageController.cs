@@ -16,7 +16,7 @@ namespace ApiExample.Controllers
     public class MessageController : ControllerBase
     {
         [HttpPost("Post")]
-        public IActionResult Post([FromBody]InfoModel model)
+        public IActionResult Post([FromForm]InfoModel model)
         {
             // https://api.cloudamqp.com/
             ConnectionFactory factory = new ConnectionFactory();
