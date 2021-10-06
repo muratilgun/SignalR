@@ -25,6 +25,11 @@ namespace ApiExample
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options
+            .AddDefaultPolicy(policy => policy.AllowCredentials()
+                                              .AllowAnyHeader()
+                                              .AllowAnyMethod()
+                                              .SetIsOriginAllowed(x => true)));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -41,7 +46,7 @@ namespace ApiExample
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ApiExample v1"));
             }
-
+            app.UseCors();
             app.UseHttpsRedirection();
 
             app.UseRouting();
