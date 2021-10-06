@@ -1,3 +1,4 @@
+using ApiExample.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +26,7 @@ namespace ApiExample
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddCors(options => options
             .AddDefaultPolicy(policy => policy.AllowCredentials()
                                               .AllowAnyHeader()
@@ -56,6 +58,7 @@ namespace ApiExample
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<MessageHub>("/messagehub");
             });
         }
     }
