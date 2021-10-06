@@ -15,6 +15,7 @@ namespace EmailSenderExample
             HubConnection con = new HubConnectionBuilder().WithUrl("https://localhost:5001/messagehub").Build();
             await con.StartAsync();
             ConnectionFactory factory = new ConnectionFactory();
+            //RabbitMQ uri
             factory.Uri = new Uri("amqps://tyttpfys:ItXhh4TU7tIp2LhlIWCyXQCOZt71i5Wb@clam.rmq.cloudamqp.com/tyttpfys");
             using IConnection connection = factory.CreateConnection();
             using IModel channel = connection.CreateModel();
