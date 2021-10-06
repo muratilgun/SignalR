@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ApiExample.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ApiExample.Controllers
@@ -13,8 +15,8 @@ namespace ApiExample.Controllers
     [ApiController]
     public class MessageController : ControllerBase
     {
-        [HttpPost("{message}")]
-        public IActionResult Post(string message)
+        [HttpPost("Post")]
+        public IActionResult Post(InfoModel model)
         {
             // https://api.cloudamqp.com/
             ConnectionFactory factory = new ConnectionFactory();
@@ -23,7 +25,8 @@ namespace ApiExample.Controllers
             using IModel channel = connection.CreateModel();
 
             channel.QueueDeclare("messagequeue", false, false, false);
-            byte[] data = Encoding.UTF8.GetBytes(message);
+            string serializeData  =JsonSerializer.Serialize(model);
+            byte[] data = Encoding.UTF8.GetBytes(serializeData);
             channel.BasicPublish("", "messagequeue", body : data);
 
 
